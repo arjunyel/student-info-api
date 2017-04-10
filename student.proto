@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package studentinfo;
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service Students {
+
+    rpc GetStudent (GetStudentRequest) returns (Student) {
+        option (google.api.http) = { get: "/v1/students/{student}" };
+    }
+    
+    rpc GetAllStudents (google.protobuf.Empty) returns (AllStudents) {
+        option (google.api.http) = { get: "/v1/students" };
+    }
+
+    rpc CreateStudent (Student) returns (Student) {
+        option (google.api.http) = {
+            post: "/v1/students"
+            body: "student"
+        };
+    }
+}
+
+
+
+message Student {
+    int32 id = 1;
+    string fName = 2;
+    string lName = 3;
+    int32 year = 4;
+    int32 gpa = 5;
+    string major = 6;
+}
+
+message GetStudentRequest {
+    int32 id = 1;
+}
+
+message AllStudents {
+    repeated Student students = 1;
+}
