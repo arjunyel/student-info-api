@@ -12,7 +12,6 @@ import (
 	context "golang.org/x/net/context"
 
 	pb "github.com/arjunyel/student-info-api"
-	"github.com/arjunyel/student-info-api/database"
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -23,20 +22,15 @@ const (
 )
 
 type server struct{}
-type student struct {
-	id    int32
-	fName string
-	lName string
-	year  int32
-	gpa   int32
-	major string
-}
+
+var db *datastore.Client
+var err error
 
 func (s *server) CreateStudent(ctx context.Context, in *pb.Student) (*pb.Student, error) {
 	kind := "Student"
 	id := strconv.Itoa(int(in.Id))
 	studentKey := datastore.NameKey(kind, id, nil)
-	if _, err := database.DB.DB.Put(ctx, studentKey, in); err != nil {
+	if _, err := db.Put(ctx, studentKey, in); err != nil {
 		return nil, err
 	}
 	fmt.Printf("Saved %v\n", studentKey)
@@ -45,9 +39,8 @@ func (s *server) CreateStudent(ctx context.Context, in *pb.Student) (*pb.Student
 
 func (s *server) GetAllStudents(ctx context.Context, in *empty.Empty) (*pb.AllStudents, error) {
 	var students []*pb.Student
-	fmt.Println("Get all")
 	query := datastore.NewQuery("Student")
-	_, err := database.DB.DB.GetAll(ctx, query, &students)
+	_, err := db.GetAll(ctx, query, &students)
 	if err != nil {
 		return nil, err
 	}
@@ -58,12 +51,11 @@ func (s *server) GetStudent(ctx context.Context, in *pb.GetStudentRequest) (*pb.
 	var student pb.Student
 	id := strconv.Itoa(int(in.Id))
 	key := datastore.NameKey("Student", id, nil)
-	err := database.DB.DB.Get(ctx, key, &student)
+	err := db.Get(ctx, key, &student)
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
-	fmt.Println(student)
 	return &student, nil
 }
 
@@ -74,8 +66,7 @@ func main() {
 	}
 	// [START build_service]
 	ctx := context.Background()
-	var err error
-	database.DB.DB, err = datastore.NewClient(ctx, projID)
+	db, err = datastore.NewClient(ctx, projID)
 	// [END build_service]
 	if err != nil {
 		log.Fatalf("Could not create datastore client: %v", err)
