@@ -11,14 +11,14 @@ import (
 
 	context "golang.org/x/net/context"
 
-	pb "github.com/arjunyel/student-info-api"
+	pb "github.com/arjunyel/student-info-api/studentinfo"
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
 const (
-	port = ":8000"
+	port = ":8080"
 )
 
 type server struct{}

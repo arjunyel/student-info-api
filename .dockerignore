@@ -1,0 +1,5 @@
+client/
+server/
+.gitignore
+README.md
+student.proto
