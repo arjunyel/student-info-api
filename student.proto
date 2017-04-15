@@ -17,7 +17,7 @@ service Students {
     rpc CreateStudent (Student) returns (Student) {
         option (google.api.http) = {
             post: "/v1/students"
-            body: "student"
+            body: "*"
         };
     }
 }
